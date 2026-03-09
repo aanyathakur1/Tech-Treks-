@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import CompanyInfo from "./pages/CompanyInfo";
 
-function App() {
+function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const trendingCompanies = ["Google", "Meta", "Microsoft", "Apple"];
@@ -9,12 +11,10 @@ function App() {
 
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
-    // later this will navigate to the company/role page
   };
 
   return (
     <div className="app">
-      {/* Navbar */}
       <nav className="navbar">
         <span className="logo">HireSense</span>
         <div className="nav-links">
@@ -23,7 +23,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Hero / Search Section */}
       <div className="hero">
         <h1>Search internships!</h1>
         <div className="search-bar">
@@ -37,7 +36,6 @@ function App() {
         </div>
       </div>
 
-      {/* Trending + Recent */}
       <div className="sections">
         <div className="trending">
           <h3>Trending Companies</h3>
@@ -53,6 +51,17 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/company" element={<CompanyInfo />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
