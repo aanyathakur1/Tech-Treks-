@@ -4,17 +4,15 @@ import "./App.css";
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const trendingCompanies = ["Google", "Meta", "Microsoft", "Apple"];
+  const trendingCompanies = ["Google", "Amazon", "Nvidia"];
   const recentAnalyses = ["Software Engineer at Apple", "Data Scientist at IBM"];
 
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
-    // later this will navigate to the company/role page
   };
 
   return (
     <div className="app">
-      {/* Navbar */}
       <nav className="navbar">
         <span className="logo">HireSense</span>
         <div className="nav-links">
@@ -23,7 +21,6 @@ function App() {
         </div>
       </nav>
 
-      {/* Hero / Search Section */}
       <div className="hero">
         <h1>Search internships!</h1>
         <div className="search-bar">
@@ -37,7 +34,6 @@ function App() {
         </div>
       </div>
 
-      {/* Trending + Recent */}
       <div className="sections">
         <div className="trending">
           <h3>Trending Companies</h3>
