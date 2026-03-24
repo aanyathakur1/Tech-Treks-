@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import CompanyInfo from "./pages/CompanyInfo";
 
-function App() {
+function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const trendingCompanies = ["Google", "Amazon", "Nvidia"];
+  const trendingCompanies = ["Google", "Meta", "Microsoft", "Apple"];
   const recentAnalyses = ["Software Engineer at Apple", "Data Scientist at IBM"];
 
   const handleSearch = () => {
@@ -49,6 +51,17 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/company" element={<CompanyInfo />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
