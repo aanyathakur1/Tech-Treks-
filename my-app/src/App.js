@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import CompanyInfo from "./pages/CompanyInfo";
+import HowItWorks from "./pages/HowItWorks"; 
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,7 +20,7 @@ function HomePage() {
         <span className="logo">HireSense</span>
         <div className="nav-links">
           <a href="#">Home</a>
-          <a href="#">How It Works</a>
+          <a href="/how-it-works">How It Works</a>
         </div>
       </nav>
 
@@ -60,6 +61,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/company" element={<CompanyInfo />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
       </Routes>
     </BrowserRouter>
   );
