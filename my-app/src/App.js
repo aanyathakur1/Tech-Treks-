@@ -17,9 +17,8 @@ function HomePage() {
   return (
     <div className="app">
       <nav className="navbar">
-        <span className="logo">HireSense</span>
+        <a href="/" style={{ textDecoration: "none" }}><span className="logo">HireSense</span></a>
         <div className="nav-links">
-          <a href="#">Home</a>
           <a href="/how-it-works">How It Works</a>
         </div>
       </nav>
