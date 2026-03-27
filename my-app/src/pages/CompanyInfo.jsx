@@ -23,16 +23,17 @@ function CompanyInfo() {
   const visiblePostings = showAll ? company.jobPostings : company.jobPostings.slice(0, 4);
 
   return (
-    <div style={{ fontFamily: "sans-serif", padding: "0 40px" }}>
+    <div style={{ fontFamily: "sans-serif" }}>
 
       {/* Navbar */}
-      <nav style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #ddd" }}>
-        <span style={{ fontWeight: "bold", fontSize: "20px", color: "#4F6EF7" }}>HireSense</span>
-        <div style={{ display: "flex", gap: "24px" }}>
-          <a href="/" style={{ textDecoration: "none", color: "black" }}>Home</a>
-          <a href="#" style={{ textDecoration: "none", color: "black" }}>How It Works</a>
+      <nav className="navbar">
+        <a href="/" style={{ textDecoration: "none" }}><span className="logo">HireSense</span></a>
+        <div className="nav-links">
+          <a href="/how-it-works">How It Works</a>
         </div>
       </nav>
+
+      <div style={{ padding: "0 40px" }}>
 
       {/* Company Header */}
       <div style={{ background: "#dde3ff", borderRadius: "12px", padding: "24px", display: "flex", gap: "24px", marginTop: "24px" }}>
@@ -99,6 +100,7 @@ function CompanyInfo() {
         <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "40px", textAlign: "center", color: "#666" }}>
           Amount of space needed can be determined later
         </div>
+      </div>
       </div>
 
     </div>
