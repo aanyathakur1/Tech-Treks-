@@ -2,7 +2,8 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import CompanyInfo from "./pages/CompanyInfo";
-import HowItWorks from "./pages/HowItWorks"; 
+import HowItWorks from "./pages/HowItWorks";
+import RoleInfo from "./pages/RoleInfo"; 
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,6 +62,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/company" element={<CompanyInfo />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/role/:roleName" element={<RoleInfo />} />
       </Routes>
     </BrowserRouter>
   );
