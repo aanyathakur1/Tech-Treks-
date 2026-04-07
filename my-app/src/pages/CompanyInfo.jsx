@@ -27,7 +27,12 @@ function CompanyInfo() {
 
       {/* Navbar */}
       <nav className="navbar">
-        <a href="/" style={{ textDecoration: "none" }}><span className="logo">HireSense</span></a>
+        <a href="/" style={{ textDecoration: "none" }}>
+          <span className="logo">
+            <img src="/logo.png" alt="HireSense Logo" />
+            HireSense
+          </span>
+        </a>
         <div className="nav-links">
           <a href="/how-it-works">How It Works</a>
         </div>

@@ -11,7 +11,20 @@ body { font-family: sans-serif; background: #f5f7ff; }
   border-bottom: 1px solid #e0e0e0;
 }
 
-.logo { font-weight: bold; font-size: 20px; color: #4a6cf7; }
+.logo { 
+  font-weight: bold; 
+  font-size: 20px; 
+  color: #4a6cf7; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo img {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+}
 
 .nav-links a { margin-left: 24px; text-decoration: none; color: #333; }
 
