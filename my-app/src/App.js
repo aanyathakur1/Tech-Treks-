@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import CompanyInfo from "./pages/CompanyInfo";
 import HowItWorks from "./pages/HowItWorks";
@@ -7,12 +7,26 @@ import RoleInfo from "./pages/RoleInfo";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const trendingCompanies = ["Google", "Meta", "Microsoft", "Apple"];
-  const recentAnalyses = ["Software Engineer at Apple", "Data Scientist at IBM"];
+  const recentAnalyses = [
+    { role: "Software Engineer", company: "Apple" },
+    { role: "Data Scientist", company: "IBM" }
+  ];
+
+  const toSlug = (value) => value.trim().replace(/\s+/g, "-");
 
   const handleSearch = () => {
     console.log("Searching for:", searchQuery);
+  };
+
+  const handleCompanyClick = (company) => {
+    navigate(`/${toSlug(company)}`);
+  };
+
+  const handleRoleClick = ({ role, company }) => {
+    navigate(`/${toSlug(company)}/${toSlug(role)}`);
   };
 
   return (
@@ -46,13 +60,15 @@ function HomePage() {
         <div className="trending">
           <h3>Trending Companies</h3>
           {trendingCompanies.map((company) => (
-            <button key={company} className="chip">{company}</button>
+            <button key={company} className="chip" onClick={() => handleCompanyClick(company)}>{company}</button>
           ))}
         </div>
         <div className="recent">
           <h3>Recent Internship Analyses</h3>
           {recentAnalyses.map((item) => (
-            <button key={item} className="chip">{item}</button>
+            <button key={`${item.role}-${item.company}`} className="chip" onClick={() => handleRoleClick(item)}>
+              {item.role} at {item.company}
+            </button>
           ))}
         </div>
       </div>
@@ -65,9 +81,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/company" element={<CompanyInfo />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
-        <Route path="/role/:roleName" element={<RoleInfo />} />
+        <Route path="/:companyName" element={<CompanyInfo />} />
+        <Route path="/:companyName/:roleName" element={<RoleInfo />} />
       </Routes>
     </BrowserRouter>
   );
