@@ -1,11 +1,41 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 function CompanyInfo() {
   const [activeFilter, setActiveFilter] = useState("Selectivity");
   const [showAll, setShowAll] = useState(false);
+  const { companyName } = useParams();
+
+  const acronymMap = {
+    ai: "AI",
+    api: "API",
+    hr: "HR",
+    ibm: "IBM",
+    ml: "ML",
+    qa: "QA",
+    ui: "UI",
+    ux: "UX"
+  };
+
+  const toTitle = (value = "") =>
+    value
+      .replace(/-/g, " ")
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => {
+        const lower = part.toLowerCase();
+        if (acronymMap[lower]) {
+          return acronymMap[lower];
+        }
+
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      })
+      .join(" ");
+
+  const toSlug = (value = "") => value.trim().replace(/\s+/g, "-");
 
   const company = {
-    name: "Google",
+    name: companyName ? toTitle(companyName) : "Google",
     linkedin: "linkedin.com/company/google",
     locations: "New York, NY · San Francisco, CA · Seattle, WA",
     hiringPage: "careers.google.com",
@@ -60,9 +90,15 @@ function CompanyInfo() {
         <div style={{ flex: 2 }}>
           <h3>Job Postings</h3>
           {visiblePostings.map((job) => (
-            <div key={job} style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px", marginBottom: "8px" }}>
-              {job}
-            </div>
+            <a
+              key={job}
+              href={`/${toSlug(company.name)}/${toSlug(job.replace(/\s*-\s*Summer\s*\d{4}.*/i, "").replace(/\s+Intern$/i, "").trim())}`}
+              style={{ textDecoration: "none", color: "inherit", display: "block" }}
+            >
+              <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px", marginBottom: "8px" }}>
+                {job}
+              </div>
+            </a>
           ))}
           <div style={{ textAlign: "center", marginTop: "12px" }}>
             <button onClick={() => setShowAll(!showAll)} style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #aaa", cursor: "pointer" }}>

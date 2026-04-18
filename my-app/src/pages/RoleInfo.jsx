@@ -3,12 +3,38 @@ import { useParams } from "react-router-dom";
 import "../App.css";
 
 function RoleInfo() {
-  const { roleName } = useParams();
+  const { companyName, roleName } = useParams();
+
+  const acronymMap = {
+    ai: "AI",
+    api: "API",
+    hr: "HR",
+    ibm: "IBM",
+    ml: "ML",
+    qa: "QA",
+    ui: "UI",
+    ux: "UX"
+  };
+
+  const toTitle = (value = "") =>
+    value
+      .replace(/-/g, " ")
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => {
+        const lower = part.toLowerCase();
+        if (acronymMap[lower]) {
+          return acronymMap[lower];
+        }
+
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+      })
+      .join(" ");
 
   // Sample role data
   const roleData = {
-    title: roleName ? roleName.replace(/-/g, " ") : "Software Engineer Intern",
-    company: "Google",
+    title: roleName ? toTitle(roleName) : "Software Engineer Intern",
+    company: companyName ? toTitle(companyName) : "Google",
     location: "New York City, NY",
     duration: "Summer 2026",
     rating: 5,
