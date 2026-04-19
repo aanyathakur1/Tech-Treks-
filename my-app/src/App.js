@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import CompanyInfo from "./pages/CompanyInfo";
@@ -9,11 +9,18 @@ function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const trendingCompanies = ["Google", "Meta", "Microsoft", "Apple"];
-  const recentAnalyses = [
-    { role: "Software Engineer", company: "Apple" },
-    { role: "Data Scientist", company: "IBM" }
-  ];
+  const [trendingCompanies, setTrendingCompanies] = useState([]);
+const [recentAnalyses, setRecentAnalyses] = useState([]);
+
+useEffect(() => {
+  fetch("http://127.0.0.1:5000/companies/trending")
+    .then(res => res.json())
+    .then(data => setTrendingCompanies(data));
+
+  fetch("http://127.0.0.1:5000/postings/recent")
+    .then(res => res.json())
+    .then(data => setRecentAnalyses(data));
+}, []);
 
   const toSlug = (value) => value.trim().replace(/\s+/g, "-");
 
@@ -25,8 +32,8 @@ function HomePage() {
     navigate(`/${toSlug(company)}`);
   };
 
-  const handleRoleClick = ({ role, company }) => {
-    navigate(`/${toSlug(company)}/${toSlug(role)}`);
+  const handleRoleClick = (item) => {
+    navigate(`/${toSlug(item.companies?.name)}/${toSlug(item.title)}`);
   };
 
   return (
@@ -60,16 +67,16 @@ function HomePage() {
         <div className="trending">
           <h3>Trending Companies</h3>
           {trendingCompanies.map((company) => (
-            <button key={company} className="chip" onClick={() => handleCompanyClick(company)}>{company}</button>
+            <button key={company.id} className="chip" onClick={() => handleCompanyClick(company.name)}>{company.name}</button>
           ))}
         </div>
         <div className="recent">
           <h3>Recent Internship Analyses</h3>
           {recentAnalyses.map((item) => (
-            <button key={`${item.role}-${item.company}`} className="chip" onClick={() => handleRoleClick(item)}>
-              {item.role} at {item.company}
-            </button>
-          ))}
+             <button key={item.id} className="chip" onClick={() => handleRoleClick(item)}>
+              {item.title} at {item.companies?.name}
+               </button>
+              ))}
         </div>
       </div>
     </div>
