@@ -13,12 +13,11 @@ function HomePage() {
 const [recentAnalyses, setRecentAnalyses] = useState([]);
 
 useEffect(() => {
-  fetch("http://127.0.0.1:5000/companies/trending")
+  fetch("http://0.0.0.0:5000/companies/trending")
     .then(res => res.json())
     .then(data => setTrendingCompanies(data));
 
-  fetch("http://127.0.0.1:5000/postings/recent")
-    .then(res => res.json())
+fetch("http://0.0.0.0:5000/postings/recent")    .then(res => res.json())
     .then(data => setRecentAnalyses(data));
 }, []);
 
