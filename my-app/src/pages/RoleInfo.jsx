@@ -1,10 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "../App.css";
 
 function RoleInfo() {
   const { companyName, roleName } = useParams();
 
+  const [roleData, setRoleData] = useState(null);
+
+useEffect(() => {
+  fetch(`http://0.0.0.0:5000/companies/search?q=${companyName}`)
+    .then(res => res.json())
+    .then(companies => {
+      if (companies.length > 0) {
+        const company = companies[0];
+        fetch(`http://0.0.0.0:5000/companies/${company.id}/postings`)
+          .then(res => res.json())
+          .then(postings => {
+            const match = postings.find(p => 
+              p.title.toLowerCase().includes(roleName.replace(/-/g, " ").toLowerCase())
+            );
+            if (match) {
+              fetch(`http://0.0.0.0:5000/postings/${match.id}`)
+                .then(res => res.json())
+                .then(data => setRoleData(data));
+            }
+          });
+      }
+    });
+
+}, [companyName, roleName]);
   const acronymMap = {
     ai: "AI",
     api: "API",
@@ -31,35 +55,7 @@ function RoleInfo() {
       })
       .join(" ");
 
-  // Sample role data
-  const roleData = {
-    title: roleName ? toTitle(roleName) : "Software Engineer Intern",
-    company: companyName ? toTitle(companyName) : "Google",
-    location: "New York City, NY",
-    duration: "Summer 2026",
-    rating: 5,
-    snapshot: {
-      applicants: "15,000-20,000",
-      acceptanceRate: "1%-3%",
-      backgrounds: [
-        "Top CS program",
-        "Previous SWE internship",
-        "Strong algorithms background"
-      ],
-      workload: 4 // out of 5
-    },
-    coreSkills: ["Python", "Java", "Data Structures"],
-    internsFeedback: {
-      resumeValue: "Very high",
-      comments: [
-        "Excellent mentorship",
-        "Great networking",
-        "Independence required",
-        "Interview process competitive"
-      ]
-    }
-  };
-
+  if (!roleData) return <div style={{ padding: "40px" }}>Loading...</div>;
   return (
     <div style={{ fontFamily: "sans-serif" }}>
       
@@ -85,16 +81,16 @@ function RoleInfo() {
               Logo
             </div>
             <div>
-              <h2 style={{ margin: "0 0 8px 0" }}>{roleData.company}</h2>
-              <p style={{ margin: "4px 0", fontSize: "16px", fontWeight: "500" }}>{roleData.title}</p>
-              <p style={{ margin: "4px 0", color: "#666" }}>📍 {roleData.location}</p>
-              <p style={{ margin: "4px 0", color: "#666" }}>{roleData.duration}</p>
+              <h2 style={{ margin: "0 0 8px 0" }}>{toTitle(companyName)}</h2>
+              <p style={{ margin: "4px 0", fontSize: "16px", fontWeight: "500" }}>{roleData.posting.title}</p>
+              <p style={{ margin: "4px 0", color: "#666" }}>📍 {roleData.posting.location}</p>
+              <p style={{ margin: "4px 0", color: "#666" }}>{roleData.posting.season}</p>
             </div>
           </div>
           <div style={{ textAlign: "center" }}>
             <div style={{ background: "#b8c5ff", borderRadius: "12px", padding: "12px 24px", marginBottom: "12px" }}>
               <div style={{ fontSize: "32px", letterSpacing: "4px" }}>
-                {Array(roleData.rating).fill("★").map((star, i) => (
+                {Array(5).fill("★").map((star, i) => (
                   <span key={i} style={{ color: "#ffd700" }}>{star}</span>
                 ))}
               </div>
@@ -115,21 +111,19 @@ function RoleInfo() {
             <div style={{ marginBottom: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #b8c5ff" }}>
                 <span style={{ color: "#555", fontSize: "15px" }}>Estimated Applicants:</span>
-                <span style={{ fontWeight: "600", fontSize: "15px" }}>{roleData.snapshot.applicants}</span>
+                <span style={{ fontWeight: "600", fontSize: "15px" }}>{`${roleData.analysis?.est_applicants_low}-${roleData.analysis?.est_applicants_high}`}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #b8c5ff" }}>
                 <span style={{ color: "#555", fontSize: "15px" }}>Estimated Acceptance Rate:</span>
-                <span style={{ fontWeight: "600", fontSize: "15px" }}>{roleData.snapshot.acceptanceRate}</span>
+                <span style={{ fontWeight: "600", fontSize: "15px" }}>{`${roleData.analysis?.accept_rate_low * 100}%-${roleData.analysis?.accept_rate_high * 100}%`}</span>
               </div>
             </div>
 
             <div style={{ marginBottom: "20px" }}>
               <p style={{ fontWeight: "600", marginBottom: "10px", fontSize: "15px" }}>Typical Backgrounds:</p>
-              <ul style={{ paddingLeft: "20px", fontSize: "15px", color: "#555", lineHeight: "1.8" }}>
-                {roleData.snapshot.backgrounds.map((bg, i) => (
-                  <li key={i}>{bg}</li>
-                ))}
-              </ul>
+              <p style={{ paddingLeft: "20px", fontSize: "15px", color: "#555", lineHeight: "1.8" }}>
+                 {roleData.analysis?.typical_background}
+              </p>
             </div>
 
             <div>
@@ -141,7 +135,7 @@ function RoleInfo() {
                       width: "24px",
                       height: "24px",
                       borderRadius: "50%",
-                      background: i < roleData.snapshot.workload ? "#4a6cf7" : "#b8c5ff"
+                      background: i < roleData.analysis?.workload_score ? "#4a6cf7" : "#b8c5ff"
                     }} />
                   ))}
                 </div>
@@ -157,7 +151,7 @@ function RoleInfo() {
               <h3 style={{ marginBottom: "18px", fontSize: "22px", borderBottom: "2px solid #b8c5ff", paddingBottom: "10px" }}>Required Skills</h3>
               <p style={{ fontWeight: "600", marginBottom: "12px", fontSize: "15px" }}>Core Skills:</p>
               <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                {roleData.coreSkills.map((skill, i) => (
+                {roleData.skills.filter(s => s.is_core).map((s, i) => (
                   <span key={i} style={{ 
                     background: "#7a8cff", 
                     color: "white", 
@@ -166,7 +160,7 @@ function RoleInfo() {
                     fontSize: "15px",
                     fontWeight: "500"
                   }}>
-                    {skill}
+                    {s.skill_name}
                   </span>
                 ))}
               </div>
@@ -178,12 +172,12 @@ function RoleInfo() {
               
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #b8c5ff", marginBottom: "14px" }}>
                 <span style={{ color: "#555", fontSize: "15px" }}>Resume Value:</span>
-                <span style={{ fontWeight: "700", fontSize: "15px", color: "#4a6cf7" }}>{roleData.internsFeedback.resumeValue}</span>
+                <span style={{ fontWeight: "700", fontSize: "15px", color: "#4a6cf7" }}>{roleData.reviews[0]?.resume_value}</span>
               </div>
 
               <p style={{ fontWeight: "600", marginBottom: "10px", fontSize: "15px" }}>Comments:</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {roleData.internsFeedback.comments.map((comment, i) => (
+                {roleData.reviews.map((r, i) => (
                   <span key={i} style={{ 
                     background: "#b8c5ff", 
                     padding: "8px 14px", 
@@ -191,7 +185,7 @@ function RoleInfo() {
                     fontSize: "14px",
                     color: "#1a1a1a"
                   }}>
-                    {comment}
+                    {r.review_text}
                   </span>
                 ))}
               </div>
