@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 
 function CompanyInfo() {
   const [activeFilter, setActiveFilter] = useState("Selectivity");
