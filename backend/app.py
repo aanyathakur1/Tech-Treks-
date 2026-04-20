@@ -31,7 +31,7 @@ def get_company(company_id):
 
 @app.route('/companies/<int:company_id>/postings', methods=['GET'])
 def get_company_postings(company_id):
-    response = supabase.table("job_postings").select("*").eq("company_id", company_id).eq("is_active, True_").execute()
+    response = supabase.table("job_postings").select("*").eq("company_id", company_id).eq("is_active", True).execute()
     return jsonify(response.data)
 
 @app.route('/postings/<int:posting_id>', methods=['GET'])
