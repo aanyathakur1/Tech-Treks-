@@ -34,23 +34,29 @@ function CompanyInfo() {
 
   const toSlug = (value = "") => value.trim().replace(/\s+/g, "-");
 
-  const company = {
-    name: companyName ? toTitle(companyName) : "Google",
-    linkedin: "linkedin.com/company/google",
-    locations: "New York, NY · San Francisco, CA · Seattle, WA",
-    hiringPage: "careers.google.com",
-    jobPostings: [
-      "Software Engineer Intern - Summer 2026",
-      "Data Science Intern - Summer 2026",
-      "Product Manager Intern - Summer 2026",
-      "UX Design Intern - Summer 2026",
-      "Machine Learning Intern - Summer 2026",
-      "Systems Engineer Intern - Summer 2026",
-    ]
-  }
+const [company, setCompany] = useState(null);
+const [postings, setPostings] = useState([]);
+
+useEffect(() => {
+  fetch(`http://0.0.0.0:5000/companies/search?q=${companyName}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        const found = data[0];
+        fetch(`http://0.0.0.0:5000/companies/${found.id}`)
+          .then(res => res.json())
+          .then(fullCompany => setCompany(fullCompany));
+        fetch(`http://0.0.0.0:5000/companies/${found.id}/postings`)
+          .then(res => res.json())
+          .then(postingData => setPostings(postingData));
+      }
+    });
+}, [companyName]);
 
   const filters = ["Selectivity", "Reputation", "Experiences"];
-  const visiblePostings = showAll ? company.jobPostings : company.jobPostings.slice(0, 4);
+  const visiblePostings = showAll ? postings : postings.slice(0, 4);
+
+  if (!company) return <div style={{ padding: "40px" }}>Loading...</div>;
 
   return (
     <div style={{ fontFamily: "sans-serif" }}>
@@ -77,9 +83,9 @@ function CompanyInfo() {
         </div>
         <div>
           <h2 style={{ margin: "0 0 8px 0" }}>{company.name}</h2>
-          <p style={{ margin: "4px 0" }}>{company.linkedin}</p>
-          <p style={{ margin: "4px 0" }}>{company.locations}</p>
-          <p style={{ margin: "4px 0" }}>{company.hiringPage}</p>
+          <a href={company.linkedin_url} target="_blank" rel="noreferrer" style={{ margin: "4px 0", display: "block" }}>{company.linkedin_url}</a>
+          <p style={{ margin: "4px 0" }}>{company.headquarters}</p>
+          <a href={company.careers_url} target="_blank" rel="noreferrer" style={{ margin: "4px 0", display: "block" }}>{company.careers_url}</a>
         </div>
       </div>
 
@@ -91,12 +97,12 @@ function CompanyInfo() {
           <h3>Job Postings</h3>
           {visiblePostings.map((job) => (
             <a
-              key={job}
-              href={`/${toSlug(company.name)}/${toSlug(job.replace(/\s*-\s*Summer\s*\d{4}.*/i, "").replace(/\s+Intern$/i, "").trim())}`}
+              key={job.id}
+              href={`/${toSlug(company.name)}/${toSlug(job.title.replace(/\s*-\s*Summer\s*\d{4}.*/i, "").replace(/\s+Intern$/i, "").trim())}`}
               style={{ textDecoration: "none", color: "inherit", display: "block" }}
             >
               <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px", marginBottom: "8px" }}>
-                {job}
+                {job.title}
               </div>
             </a>
           ))}
