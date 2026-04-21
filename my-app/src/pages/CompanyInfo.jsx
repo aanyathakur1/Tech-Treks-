@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function CompanyInfo() {
   const [activeFilter, setActiveFilter] = useState("Selectivity");
   const [showAll, setShowAll] = useState(false);
+  const [companyData, setCompanyData] = useState(null);
+  const [companyPostings, setCompanyPostings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const { companyName } = useParams();
 
   const acronymMap = {
@@ -34,20 +38,93 @@ function CompanyInfo() {
 
   const toSlug = (value = "") => value.trim().replace(/\s+/g, "-");
 
+  useEffect(() => {
+    let ignore = false;
+
+    const loadCompany = async () => {
+      const requestedName = (companyName || "").replace(/-/g, " ").trim();
+
+      if (!requestedName) {
+        setLoadError("No company selected.");
+        setCompanyData(null);
+        setCompanyPostings([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const searchResponse = await fetch(
+          `http://0.0.0.0:5000/companies/search?q=${encodeURIComponent(requestedName)}`
+        );
+
+        if (!searchResponse.ok) {
+          throw new Error("Failed to search company");
+        }
+
+        const companies = await searchResponse.json();
+        const matchedCompany =
+          companies.find(
+            (company) => company.name.toLowerCase() === requestedName.toLowerCase()
+          ) ?? companies[0];
+
+        if (!matchedCompany) {
+          if (!ignore) {
+            setCompanyData(null);
+            setCompanyPostings([]);
+            setLoadError(`No company found for "${toTitle(companyName)}".`);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const [companyResponse, postingsResponse] = await Promise.all([
+          fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}`),
+          fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}/postings`)
+        ]);
+
+        if (!companyResponse.ok || !postingsResponse.ok) {
+          throw new Error("Failed to fetch company data");
+        }
+
+        const [companyDetails, postings] = await Promise.all([
+          companyResponse.json(),
+          postingsResponse.json()
+        ]);
+
+        if (!ignore) {
+          setCompanyData(companyDetails);
+          setCompanyPostings(postings || []);
+        }
+      } catch (error) {
+        if (!ignore) {
+          setCompanyData(null);
+          setCompanyPostings([]);
+          setLoadError("Unable to load company information right now.");
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadCompany();
+
+    return () => {
+      ignore = true;
+    };
+  }, [companyName]);
+
   const company = {
-    name: companyName ? toTitle(companyName) : "Google",
-    linkedin: "linkedin.com/company/google",
-    locations: "New York, NY · San Francisco, CA · Seattle, WA",
-    hiringPage: "careers.google.com",
-    jobPostings: [
-      "Software Engineer Intern - Summer 2026",
-      "Data Science Intern - Summer 2026",
-      "Product Manager Intern - Summer 2026",
-      "UX Design Intern - Summer 2026",
-      "Machine Learning Intern - Summer 2026",
-      "Systems Engineer Intern - Summer 2026",
-    ]
-  }
+    name: companyData?.name || (companyName ? toTitle(companyName) : "Company"),
+    linkedin: companyData?.linkedin_url || "LinkedIn URL not available",
+    locations: companyData?.headquarters || "Headquarters not listed",
+    hiringPage: companyData?.careers_url || "Careers page not available",
+    jobPostings: companyPostings.map((posting) => posting.title)
+  };
 
   const filters = ["Selectivity", "Reputation", "Experiences"];
   const visiblePostings = showAll ? company.jobPostings : company.jobPostings.slice(0, 4);
@@ -69,12 +146,22 @@ function CompanyInfo() {
       </nav>
 
       <div style={{ padding: "0 40px" }}>
+      {loading ? <p style={{ marginTop: "16px" }}>Loading company information...</p> : null}
+      {loadError ? <p style={{ marginTop: "16px", color: "#c62828" }}>{loadError}</p> : null}
 
       {/* Company Header */}
       <div style={{ background: "#dde3ff", borderRadius: "12px", padding: "24px", display: "flex", gap: "24px", marginTop: "24px" }}>
-        <div style={{ width: "100px", height: "100px", background: "#aaa", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-          Logo
-        </div>
+        {companyData?.logo_url ? (
+          <img
+            src={companyData.logo_url}
+            alt={`${company.name} logo`}
+            style={{ width: "100px", height: "100px", objectFit: "contain", background: "#fff", borderRadius: "8px", padding: "8px" }}
+          />
+        ) : (
+          <div style={{ width: "100px", height: "100px", background: "#aaa", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
+            Logo
+          </div>
+        )}
         <div>
           <h2 style={{ margin: "0 0 8px 0" }}>{company.name}</h2>
           <p style={{ margin: "4px 0" }}>{company.linkedin}</p>
@@ -89,22 +176,30 @@ function CompanyInfo() {
         {/* Job Postings List */}
         <div style={{ flex: 2 }}>
           <h3>Job Postings</h3>
-          {visiblePostings.map((job) => (
-            <a
-              key={job}
-              href={`/${toSlug(company.name)}/${toSlug(job.replace(/\s*-\s*Summer\s*\d{4}.*/i, "").replace(/\s+Intern$/i, "").trim())}`}
-              style={{ textDecoration: "none", color: "inherit", display: "block" }}
-            >
-              <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px", marginBottom: "8px" }}>
-                {job}
+          {visiblePostings.length ? (
+            <>
+              {visiblePostings.map((job) => (
+                <a
+                  key={job}
+                  href={`/${toSlug(company.name)}/${toSlug(job.replace(/\s*-\s*Summer\s*\d{4}.*/i, "").replace(/\s+Intern$/i, "").trim())}`}
+                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                >
+                  <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px", marginBottom: "8px" }}>
+                    {job}
+                  </div>
+                </a>
+              ))}
+              <div style={{ textAlign: "center", marginTop: "12px" }}>
+                <button onClick={() => setShowAll(!showAll)} style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #aaa", cursor: "pointer" }}>
+                  {showAll ? "Show Less" : "Show More"}
+                </button>
               </div>
-            </a>
-          ))}
-          <div style={{ textAlign: "center", marginTop: "12px" }}>
-            <button onClick={() => setShowAll(!showAll)} style={{ padding: "8px 16px", borderRadius: "8px", border: "1px solid #aaa", cursor: "pointer" }}>
-              {showAll ? "Show Less" : "Show More"}
-            </button>
-          </div>
+            </>
+          ) : (
+            <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px" }}>
+              No active internship postings found for this company.
+            </div>
+          )}
         </div>
 
         {/* Filter Panel */}

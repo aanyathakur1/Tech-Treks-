@@ -7,6 +7,7 @@ import RoleInfo from "./pages/RoleInfo";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
   const navigate = useNavigate();
 
   const [trendingCompanies, setTrendingCompanies] = useState([]);
@@ -23,8 +24,40 @@ fetch("http://0.0.0.0:5000/postings/recent")    .then(res => res.json())
 
   const toSlug = (value) => value.trim().replace(/\s+/g, "-");
 
-  const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    const trimmedQuery = searchQuery.trim();
+
+    if (!trimmedQuery) {
+      setSearchError("Please enter a company name.");
+      return;
+    }
+
+    try {
+      setSearchError("");
+      const response = await fetch(
+        `http://0.0.0.0:5000/companies/search?q=${encodeURIComponent(trimmedQuery)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to search companies");
+      }
+
+      const companies = await response.json();
+      const match =
+        companies.find(
+          (company) => company.name.toLowerCase() === trimmedQuery.toLowerCase()
+        ) ?? companies[0];
+
+      if (!match) {
+        setSearchError(`No company found for "${trimmedQuery}".`);
+        return;
+      }
+
+      navigate(`/${toSlug(match.name)}`);
+    } catch (error) {
+      setSearchError("Unable to search right now. Please try again.");
+    }
   };
 
   const handleCompanyClick = (company) => {
@@ -50,16 +83,22 @@ fetch("http://0.0.0.0:5000/postings/recent")    .then(res => res.json())
       </nav>
 
       <div className="hero">
-        <h1>Search internships!</h1>
-        <div className="search-bar">
+        <h1>Search Internships</h1>
+        <form className="search-bar" onSubmit={handleSearch}>
           <input
             type="text"
-            placeholder="Search a company or role..."
+            placeholder="Search a company"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (searchError) {
+                setSearchError("");
+              }
+            }}
           />
-          <button onClick={handleSearch}>Analyze Posting</button>
-        </div>
+          <button type="submit">Search Company</button>
+        </form>
+        {searchError ? <p style={{ color: "#c62828", marginTop: "10px" }}>{searchError}</p> : null}
       </div>
 
       <div className="sections">
