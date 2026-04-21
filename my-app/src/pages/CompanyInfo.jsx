@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 function CompanyInfo() {
-  const [activeFilter, setActiveFilter] = useState("Selectivity");
+  const [activeFilter, setActiveFilter] = useState("Average Intern Rating");
   const [showAll, setShowAll] = useState(false);
   const [companyData, setCompanyData] = useState(null);
   const [companyPostings, setCompanyPostings] = useState([]);
@@ -126,7 +126,11 @@ function CompanyInfo() {
     jobPostings: companyPostings.map((posting) => posting.title)
   };
 
-  const filters = ["Selectivity", "Reputation", "Experiences"];
+  const filters = [
+    "Average Intern Rating",
+    "Return Offer Rate",
+    "Alumni Outcome Notes"
+  ];
   const visiblePostings = showAll ? company.jobPostings : company.jobPostings.slice(0, 4);
 
   return (
@@ -232,7 +236,7 @@ function CompanyInfo() {
 
       {/* LeetCode Section */}
       <div style={{ marginTop: "32px" }}>
-        <h3>LeetCode</h3>
+        <h3>Interview Questions</h3>
         <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "40px", textAlign: "center", color: "#666" }}>
           Amount of space needed can be determined later
         </div>
