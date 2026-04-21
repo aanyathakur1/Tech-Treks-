@@ -55,5 +55,17 @@ def get_recent_postings():
     response = supabase.table("job_postings").select("id, title, company_id, companies(name)").eq("is_active", True).order("created_at", desc=True).limit(5).execute()
     return jsonify(response.data)
 
+@app.route('/companies/<int:company_id>/reputation', methods=['GET'])
+def get_company_reputation(company_id):
+    response = supabase.table("company_reputation").select("*").eq("company_id", company_id).execute()
+    if response.data:
+        return jsonify(response.data[0])
+    return jsonify({ "error": "No reputation data found" }), 404
+
+@app.route('/companies/<int:company_id>/interview-questions', methods=['GET'])
+def get_interview_questions(company_id):
+    response = supabase.table("interview_questions").select("*").eq("company_id", company_id).execute()
+    return jsonify(response.data)
+
 if __name__ == '__main__':
     app.run(debug=True)
