@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 function HowItWorks() {
   const [activeCard, setActiveCard] = useState(0);
 
@@ -11,14 +12,14 @@ function HowItWorks() {
   return (
     <div className="app">
       <nav className="navbar">
-        <a href="/" style={{ textDecoration: "none" }}>
-          <span className="logo">
+       <Link to="/" style={{ textDecoration: "none" }}>
+  <span className="logo">
             <img src="/logo.png" alt="HireSense Logo" />
             HireSense
           </span>
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="/how-it-works">How It Works</a>
+          <Link to="/how-it-works">How It Works</Link>
         </div>
       </nav>
 

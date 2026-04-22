@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../App.css";
 
 function RoleInfo() {
@@ -61,14 +62,14 @@ useEffect(() => {
       
       {/* Navbar */}
       <nav className="navbar">
-        <a href="/" style={{ textDecoration: "none" }}>
-          <span className="logo">
+        <Link to="/" style={{ textDecoration: "none" }}>
+  <span className="logo">
             <img src="/logo.png" alt="HireSense Logo" />
             HireSense
           </span>
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="/how-it-works">How It Works</a>
+          <Link to="/how-it-works">How It Works</Link>
         </div>
       </nav>
 
@@ -77,9 +78,12 @@ useEffect(() => {
         {/* Role Header */}
         <div style={{ background: "#dde3ff", borderRadius: "12px", padding: "24px", marginTop: "24px", display: "flex", gap: "24px", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-            <div style={{ width: "100px", height: "100px", background: "#aaa", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "14px", fontWeight: "600" }}>
-              Logo
-            </div>
+            <img
+  src={`https://www.google.com/s2/favicons?domain=${roleData.posting?.apply_url?.replace("https://", "").split("/")[0]}&sz=128`}
+  alt="company logo"
+  style={{ width: "100px", height: "100px", objectFit: "contain", background: "#fff", borderRadius: "8px", padding: "8px" }}
+  onError={(e) => { e.target.style.display = 'none' }}
+/>
             <div>
               <h2 style={{ margin: "0 0 8px 0" }}>{toTitle(companyName)}</h2>
               <p style={{ margin: "4px 0", fontSize: "16px", fontWeight: "500" }}>{roleData.posting.title}</p>
@@ -111,12 +115,16 @@ useEffect(() => {
             <div style={{ marginBottom: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #b8c5ff" }}>
                 <span style={{ color: "#555", fontSize: "15px" }}>Estimated Applicants:</span>
-                <span style={{ fontWeight: "600", fontSize: "15px" }}>{`${roleData.analysis?.est_applicants_low}-${roleData.analysis?.est_applicants_high}`}</span>
-              </div>
+<span style={{ fontWeight: "600", fontSize: "15px" }}>
+  {roleData.analysis ? `${roleData.analysis.est_applicants_low}-${roleData.analysis.est_applicants_high}` : "Data not available"}
+</span>             
+ </div>
               <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #b8c5ff" }}>
                 <span style={{ color: "#555", fontSize: "15px" }}>Estimated Acceptance Rate:</span>
-                <span style={{ fontWeight: "600", fontSize: "15px" }}>{`${roleData.analysis?.accept_rate_low * 100}%-${roleData.analysis?.accept_rate_high * 100}%`}</span>
-              </div>
+<span style={{ fontWeight: "600", fontSize: "15px" }}>
+  {roleData.analysis ? `${(roleData.analysis.accept_rate_low * 100).toFixed(1)}%-${(roleData.analysis.accept_rate_high * 100).toFixed(1)}%` : "Data not available"}
+</span>          
+    </div>
             </div>
 
             <div style={{ marginBottom: "20px" }}>
@@ -196,18 +204,21 @@ useEffect(() => {
 
         {/* Apply Button */}
         <div style={{ textAlign: "center", marginTop: "40px", marginBottom: "40px" }}>
-          <button style={{
-            padding: "14px 32px",
-            background: "#4a6cf7",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            cursor: "pointer",
-            fontWeight: "600"
-          }}>
-            Apply Now
-          </button>
+          <button
+  onClick={() => window.open(roleData.posting.apply_url, "_blank")}
+  style={{
+    padding: "14px 32px",
+    background: "#4a6cf7",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "16px",
+    cursor: "pointer",
+    fontWeight: "600"
+  }}
+>
+  Apply Now
+</button>
         </div>
 
       </div>

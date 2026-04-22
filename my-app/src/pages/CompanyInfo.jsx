@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function CompanyInfo() {
   const [activeFilter, setActiveFilter] = useState("Average Intern Rating");
@@ -9,6 +10,8 @@ function CompanyInfo() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const { companyName } = useParams();
+  const [reputation, setReputation] = useState(null);
+  const [interviewQuestions, setInterviewQuestions] = useState([]);
 
   const acronymMap = {
     ai: "AI",
@@ -98,6 +101,13 @@ function CompanyInfo() {
           setCompanyData(companyDetails);
           setCompanyPostings(postings || []);
         }
+        fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}/reputation`)
+  .then(res => res.json())
+  .then(data => setReputation(data));
+
+fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}/interview-questions`)
+  .then(res => res.json())
+  .then(data => setInterviewQuestions(data));
       } catch (error) {
         if (!ignore) {
           setCompanyData(null);
@@ -138,14 +148,14 @@ function CompanyInfo() {
 
       {/* Navbar */}
       <nav className="navbar">
-        <a href="/" style={{ textDecoration: "none" }}>
-          <span className="logo">
+        <Link to="/" style={{ textDecoration: "none" }}>
+  <span className="logo">
             <img src="/logo.png" alt="HireSense Logo" />
             HireSense
           </span>
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="/how-it-works">How It Works</a>
+          <Link to="/how-it-works">How It Works</Link>
         </div>
       </nav>
 
@@ -156,16 +166,19 @@ function CompanyInfo() {
       {/* Company Header */}
       <div style={{ background: "#dde3ff", borderRadius: "12px", padding: "24px", display: "flex", gap: "24px", marginTop: "24px" }}>
         {companyData?.logo_url ? (
-          <img
-            src={companyData.logo_url}
-            alt={`${company.name} logo`}
-            style={{ width: "100px", height: "100px", objectFit: "contain", background: "#fff", borderRadius: "8px", padding: "8px" }}
-          />
-        ) : (
-          <div style={{ width: "100px", height: "100px", background: "#aaa", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "white" }}>
-            Logo
-          </div>
-        )}
+  <img
+    src={companyData.logo_url}
+    alt={`${company.name} logo`}
+    style={{ width: "100px", height: "100px", objectFit: "contain", background: "#fff", borderRadius: "8px", padding: "8px" }}
+  />
+) : (
+  <img
+  src={`https://www.google.com/s2/favicons?domain=${companyData?.careers_url?.replace("https://", "").split("/")[0]}&sz=128`}
+  alt={`${company.name} logo`}
+  style={{ width: "100px", height: "100px", objectFit: "contain", background: "#fff", borderRadius: "8px", padding: "8px" }}
+  onError={(e) => { e.target.style.display = 'none' }}
+/>
+)}
         <div>
           <h2 style={{ margin: "0 0 8px 0" }}>{company.name}</h2>
           <a href={company.linkedin_url} target="_blank" rel="noreferrer" style={{ margin: "4px 0", display: "block" }}>{company.linkedin_url}</a>
@@ -228,9 +241,17 @@ function CompanyInfo() {
               </button>
             ))}
           </div>
-          <div style={{ background: "#dde3ff", borderRadius: "8px", height: "300px", padding: "16px" }}>
-            Filtering by: {activeFilter}
-          </div>
+          <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "16px" }}>
+  {activeFilter === "Average Intern Rating" && (
+    <p><strong>Average Intern Rating:</strong> {reputation?.avg_intern_rating}/5</p>
+  )}
+  {activeFilter === "Return Offer Rate" && (
+    <p><strong>Return Offer Rate:</strong> {reputation ? `${(reputation.return_offer_rate * 100).toFixed(0)}%` : "N/A"}</p>
+  )}
+  {activeFilter === "Alumni Outcome Notes" && (
+    <p>{reputation?.alumni_outcome_note || "No data available"}</p>
+  )}
+</div>
         </div>
 
       </div>
@@ -238,9 +259,21 @@ function CompanyInfo() {
       {/* LeetCode Section */}
       <div style={{ marginTop: "32px" }}>
         <h3>Interview Questions</h3>
-        <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "40px", textAlign: "center", color: "#666" }}>
-          Amount of space needed can be determined later
+       <div style={{ marginTop: "32px", marginBottom: "40px" }}>
+  <h3>Interview Questions</h3>
+  <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "24px" }}>
+    {interviewQuestions.length ? (
+      interviewQuestions.slice(0, 5).map((q) => (
+        <div key={q.id} style={{ padding: "10px 0", borderBottom: "1px solid #b8c5ff" }}>
+          <p style={{ margin: 0 }}>{q.question}</p>
+          <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#666" }}>{q.category} · {q.source}</p>
         </div>
+      ))
+    ) : (
+      <p style={{ color: "#666", textAlign: "center" }}>No interview questions available.</p>
+    )}
+  </div>
+</div>
       </div>
       </div>
 
