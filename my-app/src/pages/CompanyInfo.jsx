@@ -260,7 +260,7 @@ fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}/interview-questions`)
       <div style={{ marginTop: "32px" }}>
         <h3>Interview Questions</h3>
        <div style={{ marginTop: "32px", marginBottom: "40px" }}>
-  <h3>Interview Questions</h3>
+  
   <div style={{ background: "#dde3ff", borderRadius: "8px", padding: "24px" }}>
     {interviewQuestions.length ? (
       interviewQuestions.slice(0, 5).map((q) => (
