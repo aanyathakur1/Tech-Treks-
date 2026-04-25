@@ -144,7 +144,7 @@ fetch(`http://0.0.0.0:5000/companies/${matchedCompany.id}/interview-questions`)
   const visiblePostings = showAll ? companyPostings : companyPostings.slice(0, 4);
 
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
+    <div style={{ fontFamily: "inherit" }}>
 
       {/* Navbar */}
       <nav className="navbar">

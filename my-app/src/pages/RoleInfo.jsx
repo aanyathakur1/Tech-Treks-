@@ -58,7 +58,7 @@ useEffect(() => {
 
   if (!roleData) return <div style={{ padding: "40px" }}>Loading...</div>;
   return (
-    <div style={{ fontFamily: "sans-serif" }}>
+    <div style={{ fontFamily: "inherit" }}>
       
       {/* Navbar */}
       <nav className="navbar">
