@@ -1,8 +1,8 @@
 # HireSense
 
-HireSense is a full-stack web application designed to help students better understand internship opportunities by analyzing job postings for transparency and competitiveness.
+HireSense is a full-stack web application designed to help students make more informed decisions during the internship search by surfacing insights that are often difficult to find in traditional job postings.
 
-Developed as part of Tech@NYU's Tech Treks program, HireSense combines web scraping, data processing, and a user-facing web application to turn information from internship postings into more useful insights for students navigating the recruiting process.
+The platform analyzes internship opportunities to provide information on factors such as estimated competitiveness, required skills, typical applicant backgrounds, interview preparation, and previous intern experiences. HireSense was developed as part of Tech@NYU's Tech Treks program using web scraping, data processing, and full-stack development.
 
 ## Product Preview
 
@@ -12,12 +12,13 @@ Developed as part of Tech@NYU's Tech Treks program, HireSense combines web scrap
 
 ## Features
 
-- Analyzes internship and job postings using key indicators of transparency and competitiveness
-- Collects and processes job posting data through web scraping
-- Presents insights through an accessible web interface
-- Stores and manages application data using Supabase
-- Integrates frontend and backend components into a full-stack application
-
+- Analyzes internship postings to provide additional context beyond the original job description
+- Surfaces estimated competitiveness and applicant insights
+- Identifies relevant skills and common candidate backgrounds
+- Provides interview preparation information and commonly asked questions
+- Incorporates previous intern experiences and insights
+- Uses web scraping and data processing to collect and organize internship information
+  
 ## Tech Stack
 
 - **Frontend:** React
