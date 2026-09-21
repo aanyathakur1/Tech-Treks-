@@ -18,6 +18,17 @@ The platform analyzes internship opportunities to provide information on factors
 - Provides interview preparation information and commonly asked questions
 - Incorporates previous intern experiences and insights
 - Uses web scraping and data processing to collect and organize internship information
+
+## Development
+
+HireSense was developed collaboratively as part of Tech@NYU's Tech Treks program. My contributions focused primarily on full-stack development and application integration, including:
+
+- Building frontend components for company information and "How It Works" pages
+- Developing Flask API endpoints to serve internship and company data
+- Connecting Flask backend endpoints to the Supabase database
+- Integrating frontend pages with backend APIs to retrieve company and role information
+- Adding backend endpoints for reputation data and interview questions
+- Collaborating through Git/GitHub using feature branches, merges, and conflict resolution
   
 ## Tech Stack
 
